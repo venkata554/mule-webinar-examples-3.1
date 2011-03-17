@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:http="http://www.mulesoft.org/schema/mule/http"
+       xmlns:file="http://www.mulesoft.org/schema/mule/file"
+       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.1/mule-file.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.1/mule-http.xsd">
+
+    <expression-transformer name="extractMessage" evaluator="header" expression="INBOUND:message"/>
+
+    <bridge name="RecordMessages"
+            inboundAddress="http://localhost:18081/services/record"
+            outboundAddress="file://c:/temp/output"
+            transformer-refs="extractMessage"
+            exchange-pattern="one-way">
+    </bridge>
+
+</mule>

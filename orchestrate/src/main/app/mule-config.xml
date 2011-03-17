@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:spring="http://www.springframework.org/schema/beans"
+       xmlns:http="http://www.mulesoft.org/schema/mule/http"
+       xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+
+       
+    xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd
+       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.1/mule-http.xsd">
+
+    <vm:endpoint name="english" path="english" exchange-pattern="request-response"/>
+    <vm:endpoint name="french" path="french" exchange-pattern="request-response"/>
+    <vm:endpoint name="spanish" path="spanish" exchange-pattern="request-response"/>
+    <vm:endpoint name="unknown" path="unknown" exchange-pattern="request-response"/>
+
+    <expression-transformer name="getName" evaluator="header" expression="INBOUND:name"/>
+    <expression-transformer name="getLanguage" evaluator="header" expression="INBOUND:language"/>
+
+    <flow name="nameAndLanguage">
+        <http:inbound-endpoint host="localhost" port="18082" path="hello"/>
+        <logger level="INFO"/>
+        <choice>
+            <when expression="INBOUND:language = English" evaluator="header">
+                <transformer ref="getName"/>
+                <vm:outbound-endpoint ref="english"/>
+            </when>
+            <when expression="INBOUND:language = French" evaluator="header">
+                <transformer ref="getName"/>
+                <vm:outbound-endpoint ref="french"/>
+            </when>
+            <when expression="INBOUND:language = Spanish" evaluator="header">
+                <transformer ref="getName"/>
+                <vm:outbound-endpoint ref="spanish"/>
+            </when>
+            <otherwise>
+                <transformer ref="getLanguage"/>
+                <vm:outbound-endpoint ref="unknown"/>
+            </otherwise>
+        </choice>
+    </flow>
+    
+    <simple-service name="English" endpoint-ref="english" component-class="org.mule.hello.HelloService"/>
+
+    <simple-service name="French" endpoint-ref="french" component-class="org.mule.hello.BonjourService"/>
+    
+    <simple-service name="Spanish" endpoint-ref="spanish" component-class="org.mule.hello.HolaService"/>
+
+    <simple-service name="UnknownLanguage" endpoint-ref="unknown" component-class="org.mule.hello.UnknownLanguageService"/>
+</mule>
