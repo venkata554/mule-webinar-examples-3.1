@@ -14,6 +14,9 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Callable;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Formatter implements Callable
 {
 
@@ -21,14 +24,20 @@ public class Formatter implements Callable
     {
         MuleMessage msg = muleEventContext.getMessage();
         String name = msg.getPayloadAsString();
-        String avg = msg.getOutboundProperty("average");
-        String rbi = msg.getOutboundProperty("rbi");
-        String hr = msg.getOutboundProperty("hr");
-        String formatted = "<html><body><table>" + makeRow("Name", name) +
-                           makeRow("Average", avg) + makeRow("RBIs", rbi) + makeRow("Home Runs",hr) +
-                           "</table></body></html>";
-        MuleMessage response = new DefaultMuleMessage(formatted, muleEventContext.getMuleContext());
-        response.setOutboundProperty("content-type", "text/html");
+        String avg = msg.getInvocationProperty("average");
+        String rbi = msg.getInvocationProperty("rbi");
+        String hr = msg.getInvocationProperty("hr");
+
+        Map response = new HashMap();
+        response.put("player", name);
+        response.put("average", avg);
+        response.put("rbis", rbi);
+        response.put("homeruns", hr);
+//        String formatted = "<html><body><table>" + makeRow("Name", name) +
+//                           makeRow("Average", avg) + makeRow("RBIs", rbi) + makeRow("Home Runs",hr) +
+//                           "</table></body></html>";
+//        MuleMessage response = new DefaultMuleMessage(formatted, muleEventContext.getMuleContext());
+//        response.setOutboundProperty("content-type", "text/html");
         return response;
     }
 

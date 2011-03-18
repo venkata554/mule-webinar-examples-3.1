@@ -10,7 +10,7 @@
     <description>Demonstrates message enrichment via baseball.</description>
 
     <properties>
-        <muleVersion>3.1.1</muleVersion>
+        <muleVersion>3.2.0-SNAPSHOT</muleVersion>
     </properties>
 
     <dependencies>
@@ -25,6 +25,16 @@
             <version>${muleVersion}</version>
         </dependency>
         <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-ibeans</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-scripting</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
+        <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-vm</artifactId>
             <version>${muleVersion}</version>
@@ -32,6 +42,11 @@
         <dependency>
             <groupId>org.mule.transports</groupId>
             <artifactId>mule-transport-http</artifactId>
+            <version>${muleVersion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-ajax</artifactId>
             <version>${muleVersion}</version>
         </dependency>
         <dependency>

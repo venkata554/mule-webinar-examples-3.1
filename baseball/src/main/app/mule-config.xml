@@ -1,31 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:spring="http://www.springframework.org/schema/beans"
-       xmlns:http="http://www.mulesoft.org/schema/mule/http"
        xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
-
+        xmlns:ajax="http://www.mulesoft.org/schema/mule/ajax"
+        xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
        
     xsi:schemaLocation="
-       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.1/mule-scripting.xsd
+       http://www.mulesoft.org/schema/mule/ajax http://www.mulesoft.org/schema/mule/ajax/3.1/mule-ajax.xsd
        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.1/mule.xsd
-       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd
-       http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.1/mule-http.xsd">
+       http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.1/mule-vm.xsd">
+
+    <ajax:connector name="ajaxServer" serverUrl="http://0.0.0.0:8082" resourceBase="${app.home}/docroot"/>
 
     <flow name="LookupFlow">
-        <http:inbound-endpoint host="localhost" port="18080" path="services/baseball" exchange-pattern="request-response"/>
-        <expression-transformer evaluator="header" expression="INBOUND:name"/>
+        <ajax:inbound-endpoint channel="/stats"/>
         <logger level="INFO"/>
-        <enricher target="#[header:OUTBOUND:average]" source="#[payload]">
+        <enricher target="#[header:INVOCATION:average]" source="#[payload]">
             <vm:outbound-endpoint path="averages" exchange-pattern="request-response"/>
         </enricher>
-        <enricher target="#[header:OUTBOUND:rbi]" source="#[payload]">
+        <enricher target="#[header:INVOCATION:rbis]" source="#[payload]">
             <vm:outbound-endpoint path="rbis" exchange-pattern="request-response"/>
         </enricher>
-        <enricher target="#[header:OUTBOUND:hr]" source="#[payload]">
+        <enricher target="#[header:INVOCATION:homeruns]" source="#[payload]">
             <vm:outbound-endpoint path="hrs" exchange-pattern="request-response"/>
         </enricher>
-        <component class="org.mule.baseball.Formatter"/>
+        <scripting:component>
+            <scripting:script engine="groovy">
+                <scripting:text>
+                    return [player:payload, average:message.getInvocationProperty("average"),
+                                rbis:message.getInvocationProperty("rbis"),
+                                homeruns:message.getInvocationProperty("homeruns")];
+                </scripting:text>
+            </scripting:script>
+        </scripting:component>
+        <ajax:outbound-endpoint channel="/results"/>
     </flow>
 
     <flow name="lookupAverage">
