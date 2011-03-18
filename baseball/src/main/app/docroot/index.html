@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+
+<head>
+    <title>Mule Enrichment Example</title>
+    <link rel="stylesheet" type="text/css" href="main.css"/>
+    <script type="text/javascript" src="mule-resource/js/mule.js"></script>
+
+    <script type="text/javascript">
+
+        function init()
+        {
+            mule.subscribe("/results", statsCallback);
+        }
+
+        function destroy()
+        {
+            mule.unsubscribe("/results");
+        }
+
+        function clickPlayer(name)
+        {
+            mule.publish('/stats', name);
+        }
+
+        function statsCallback(stats)
+        {
+            console.log('stats: ' + stats);
+
+            document.getElementById("player").innerText = stats.data.player;
+            document.getElementById("rbis").innerText = stats.data.rbis;
+            document.getElementById("average").innerText = stats.data.average;
+            document.getElementById("homeruns").innerText = stats.data.homeruns;
+        }
+
+    </script>
+</head>
+<body onload="init();" onunload="destroy();">
+<table>
+    <tr>
+        <td>
+            <map id="imgmap" name="imgmap">
+                <area shape="rect" alt="Ruth" title="Ruth" coords="79,92,512,376" href="javascript:void(0);" onclick="clickPlayer('Ruth');return false;"/>
+                <area shape="rect" alt="Aaron" title="Aaron" coords="72,416,277,660" href="javascript:void(0);" onclick="clickPlayer('Aaron');return false;"/>
+                <area shape="rect" alt="Mays" title="Mays" coords="292,418,493,661" href="javascript:void(0);" onclick="clickPlayer('Mays');return false;"/>
+                <!-- Created by Online Image Map Editor (http://www.maschek.hu/imagemap/index) --></map>
+
+            <img src="images/baseball.jpg" alt="baseball heros" usemap="imgmap"/>
+        </td>
+        <td valign="top">
+            <table>
+                <tr>
+                    <td>Name:</td>
+                    <td id="player"></td>
+                </tr>
+                <tr>
+                    <td>RBIs:</td>
+                    <td id="rbis"></td>
+                </tr>
+                 <tr>
+                    <td>Average:</td>
+                    <td id="average"></td>
+                </tr>
+                <tr>
+                    <td>Homeruns:</td>
+                    <td id="homeruns"></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+</body>
+</html>
+
